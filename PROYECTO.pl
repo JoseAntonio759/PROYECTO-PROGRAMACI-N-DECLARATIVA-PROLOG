@@ -1,4 +1,4 @@
-nodo(i2m, -2, 1).
+nodo(i2m, -2, 0).
 nodo(i1a, -1, 1).
 nodo(i1m, -1, 0).
 nodo(i1b, -1, -1).
