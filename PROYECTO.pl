@@ -73,13 +73,13 @@ movimiento_valido(Estado, Desde, Hacia) :-
 % Caso de liebre, los movimientos que puede realizar junto con que su destino no coincida con la posición
 % de los sabuesos.
     (Turno = liebre, Desde = Liebre,
-    movimiento(Liebre, Desde, Hacia), 
+    movimiento(liebre, Desde, Hacia), 
     \+ pertenece(Hacia, Sabuesos)
     ;
 % Caso de sabuesos, los movimientos que pueden realizar los sabuesos junto con que su destino no 
 % coincida con la posición de otros sabuesos ni con la de la liebre.
     Turno = sabuesos, pertenece(Desde, Sabuesos), 
-    movimiento(Sabuesos, Desde, Hacia),
+    movimiento(sabuesos, Desde, Hacia),
     Hacia \= Liebre, \+ pertenece(Hacia, Sabuesos)).
 
 % Movemos la ficha de la liebre, como es una única posición no tiene más que el movimiento sea un nodo 
