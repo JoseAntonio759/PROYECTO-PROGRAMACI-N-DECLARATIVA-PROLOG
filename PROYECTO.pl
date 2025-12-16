@@ -32,8 +32,6 @@ mostrar_estado(estado(Liebre, Sabuesos, Turno)) :-
     pintar_tablero(estado(Liebre, Sabuesos, Turno)).
 
 
-
-
 pintar_tablero(Estado) :-
     simbolo(i1a, Estado, I1A), simbolo(ma, Estado, MA), simbolo(d1a, Estado, D1A),
     simbolo(i2m, Estado, I2M), simbolo(i1m, Estado, I1M), simbolo(mm, Estado, MM),
@@ -55,7 +53,7 @@ simbolo(Celda, estado(Liebre, Sabuesos, _), Simbolo) :-
     ).
 
 pertenece(Elem, [Elem|_]).
-pertenece(Elem, [H|T]) :- pertenece(Elem, T).
+pertenece(Elem, [_|T]) :- pertenece(Elem, T).
 
 % Comprobamos en el movimiento que el jugador sea o liebre o sabuesos, en ambos comprobamos que el destino
 % pertenece a las posiciones a las cuales la posición inicial es adyacente, y en adición a los sabuesos,
@@ -104,7 +102,7 @@ sustituir([H1|T1], PosicionAQuitar, PosicionNueva, [H1|T2]) :-
 
 % Aplicamos el movimiento elegido, moviendo la ficha y cambiando el turno que corresponde
 aplicar_movimiento(Estado, Movimiento, NuevoEstado) :- 
-    Estado = estado(Liebre, Sabuesos, Turno),
+    Estado = estado(_, _, _),
     mover_ficha(Estado, Movimiento, Estado2),
     cambiar_turno(Estado2, NuevoEstado).
 
@@ -117,3 +115,37 @@ cambiar_turno(Estado, NuevoEstado) :-
     Turno = sabuesos,
     NuevoEstado = estado(Liebre, Sabuesos, liebre)
     ).
+
+
+
+%movimientos posibles de la liebre
+movimientos_disponibles(estado(Liebre, Sabuesos, liebre), Movs) :- 
+    findall(Hacia, movimiento_valido(estado(Liebre, Sabuesos, liebre), Liebre, Hacia), Movs).
+
+%movimientos posibles de los sabuesos
+movimientos_disponibles(estado(Liebre, Sabuesos, sabuesos), Movs) :-
+    findall((Desde,Hacia), (member(Desde, Sabuesos), movimiento_valido(estado(Liebre, Sabuesos, sabuesos), Desde, Hacia) ), Movs).
+
+
+
+%caso base de mostrar movimientos donde nos quedamos con una lista vacia de movimientos y el indice cualquiera
+mostrar_movimientos([], _).
+
+%caso general de msotrar movimientos donde tenemos una lista con cabeza Mov y cola Resto, y un indice
+mostrar_movimientos([Mov | Resto], Indice) :- format("~d. ~w~n", [Indice, Mov]), Indice1 is Indice + 1, mostrar_movimientos(Resto, Indice1).
+
+
+%calcula y muestra los movimientos disponibles, pide al usuario un numero correspondiente a un movimiento y deveulve el movimiento elegido
+pedir_movimiento(Estado, MovimientoElegido) :- mostrar_estado(Estado), movimientos_disponibles(Estado, Movs), format("Turno: ~w~n", [Estado]), format("Movimientos posibles:~n"), mostrar_movimientos(Movs, 1),
+    format("Elige un movimiento: "), read(Opcion), nth1(Opcion, Movs, MovimientoElegido).
+    
+
+
+
+
+
+
+
+
+
+    
