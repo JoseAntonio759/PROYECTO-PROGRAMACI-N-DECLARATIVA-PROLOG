@@ -136,8 +136,26 @@ mostrar_movimientos([Mov | Resto], Indice) :- format("~d. ~w~n", [Indice, Mov]),
 
 
 %calcula y muestra los movimientos disponibles, pide al usuario un numero correspondiente a un movimiento y deveulve el movimiento elegido
-pedir_movimiento(Estado, MovimientoElegido) :- mostrar_estado(Estado), movimientos_disponibles(Estado, Movs), format("Turno: ~w~n", [Estado]), format("Movimientos posibles:~n"), mostrar_movimientos(Movs, 1),
+pedir_movimiento(Estado, MovimientoElegido) :- movimientos_disponibles(Estado, Movs), format("Turno: ~w~n", [Estado]), format("Movimientos posibles:~n"), mostrar_movimientos(Movs, 1),
     format("Elige un movimiento: "), read(Opcion), nth1(Opcion, Movs, MovimientoElegido).
+
+
+
+%la liebre gana si llega a la casilla d2m
+fin_partida(estado(i2m, _, _), liebre).
+
+%los sabuesos ganan si la liebre no tiene movimientos validos, y la liebre tampoco puede estar en i2m porque entonces habria ganado ella
+fin_partida(estado(Liebre, Sabuesos, liebre), sabuesos) :- Liebre \= i2m, findall(Hacia, movimiento_valido(estado(Liebre, Sabuesos, _), Liebre, Hacia), Movs), Movs = []. 
+
+
+
+%no hacemos pintar_tablero porque mostrar_estado muestra el estado y ademas pinta el tablero, 
+%vemos si se cumple la condicion de fin_partida, si se cumple imprime el ganador sino pide un movimiento lo aplica y vuelve a llamar a jugar_turno
+jugar_turno(Estado, Ganador) :-
+    mostrar_estado(Estado),
+    ( fin_partida(Estado, Ganador) -> format("Fin de partida gana: ~w~n", [Ganador]) ; pedir_movimiento(Estado, Movimiento), aplicar_movimiento(Estado, Movimiento, NuevoEstado), jugar_turno(NuevoEstado, Ganador)).
+
+
     
 
 
