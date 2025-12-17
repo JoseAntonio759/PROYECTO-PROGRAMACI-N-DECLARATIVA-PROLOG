@@ -22,8 +22,7 @@ adyacentes(d1m, [mm, d1a, d1b, d2m]).
 adyacentes(d1b, [mm, mb, d1m, d2m]).
 adyacentes(d2m, [d1a, d1m, d1b]).
 
-
-estado_inicial(estado(d2m, [i1a, i2m, i1b], liebre)).
+estado_inicial(estado(d2m, [i1a, i2m, i1b], Turno)).
 
 mostrar_estado(estado(Liebre, Sabuesos, Turno)) :-
     format("Liebre en: ~w~n", [Liebre]),
@@ -80,12 +79,14 @@ movimiento_valido(Estado, Desde, Hacia) :-
     movimiento(sabuesos, Desde, Hacia),
     Hacia \= Liebre, \+ pertenece(Hacia, Sabuesos)).
 
+
 % Movemos la ficha de la liebre, como es una única posición no tiene más que el movimiento sea un nodo 
 % y actualizamos el estado con este.
 mover_ficha(Estado, Movimiento, NuevoEstado) :-
     Estado = estado(Liebre, Sabuesos, liebre),
     movimiento_valido(Estado, Liebre, Movimiento), 
     NuevoEstado = estado(Movimiento, Sabuesos, liebre).
+
 
 % Movemos la ficha del sabueso a mover, cómo son varios, la posición en la que se encuentra el sabueso 
 % a mover la retiramos de la lista de posiciones y se actualiza con su destino con las otras igual.
@@ -95,16 +96,19 @@ mover_ficha(Estado, (Desde, Hacia), NuevoEstado) :-
     sustituir(Sabuesos, Desde, Hacia, NuevosSabuesos),
     NuevoEstado = estado(Liebre, NuevosSabuesos, sabuesos).
 
+
 % Predicado para sustituir posiciones de la lista.
 sustituir([PosicionAQuitar|T1], PosicionAQuitar, PosicionNueva, [PosicionNueva|T1]).
 sustituir([H1|T1], PosicionAQuitar, PosicionNueva, [H1|T2]) :- 
     sustituir(T1, PosicionAQuitar, PosicionNueva, T2).
+
 
 % Aplicamos el movimiento elegido, moviendo la ficha y cambiando el turno que corresponde
 aplicar_movimiento(Estado, Movimiento, NuevoEstado) :- 
     Estado = estado(_, _, _),
     mover_ficha(Estado, Movimiento, Estado2),
     cambiar_turno(Estado2, NuevoEstado).
+
 
 % Predicado para cambiar el turno de un estado
 cambiar_turno(Estado, NuevoEstado) :- 
@@ -115,7 +119,6 @@ cambiar_turno(Estado, NuevoEstado) :-
     Turno = sabuesos,
     NuevoEstado = estado(Liebre, Sabuesos, liebre)
     ).
-
 
 
 %movimientos posibles de la liebre
@@ -136,12 +139,17 @@ mostrar_movimientos([Mov | Resto], Indice) :- format("~d. ~w~n", [Indice, Mov]),
 
 
 %calcula y muestra los movimientos disponibles, pide al usuario un numero correspondiente a un movimiento y deveulve el movimiento elegido
-pedir_movimiento(Estado, MovimientoElegido) :- movimientos_disponibles(Estado, Movs), format("Turno: ~w~n", [Estado]), format("Movimientos posibles:~n"), mostrar_movimientos(Movs, 1),
-    format("Elige un movimiento: "), read(Opcion), nth1(Opcion, Movs, MovimientoElegido).
+pedir_movimiento(Estado, MovimientoElegido) :- movimientos_disponibles(Estado, Movs), 
+    format("Turno: ~w~n", [Estado]), 
+    format("Movimientos posibles:~n"), 
+    mostrar_movimientos(Movs, 1),
+    format("Elige un movimiento: "), 
+    read(Opcion), 
+    nth1(Opcion, Movs, MovimientoElegido).
 
 
 
-%la liebre gana si llega a la casilla d2m
+%la liebre gana si llega a la casilla i2m
 fin_partida(estado(i2m, _, _), liebre).
 
 %los sabuesos ganan si la liebre no tiene movimientos validos, y la liebre tampoco puede estar en i2m porque entonces habria ganado ella
@@ -153,7 +161,18 @@ fin_partida(estado(Liebre, Sabuesos, liebre), sabuesos) :- Liebre \= i2m, findal
 %vemos si se cumple la condicion de fin_partida, si se cumple imprime el ganador sino pide un movimiento lo aplica y vuelve a llamar a jugar_turno
 jugar_turno(Estado, Ganador) :-
     mostrar_estado(Estado),
-    ( fin_partida(Estado, Ganador) -> format("Fin de partida gana: ~w~n", [Ganador]) ; pedir_movimiento(Estado, Movimiento), aplicar_movimiento(Estado, Movimiento, NuevoEstado), jugar_turno(NuevoEstado, Ganador)).
+    ( fin_partida(Estado, Ganador); 
+    pedir_movimiento(Estado, Movimiento), 
+    aplicar_movimiento(Estado, Movimiento, NuevoEstado), 
+    jugar_turno(NuevoEstado, Ganador)).
+
+
+% Jugamos la partida con un estado inicial, realiza el predicado de jugar turno hasta encontrar
+% un ganador impriméndolo por pantalla
+jugar_partida(Turno) :- 
+    Estado = estado(d2m, [i1a, i2m, i1b], Turno), 
+    jugar_turno(Estado, Turno),
+    format("Fin de partida gana: ~w~n", [Turno]).
 
 
     
