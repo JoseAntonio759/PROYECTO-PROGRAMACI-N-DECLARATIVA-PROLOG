@@ -22,7 +22,7 @@ adyacentes(d1m, [mm, d1a, d1b, d2m]).
 adyacentes(d1b, [mm, mb, d1m, d2m]).
 adyacentes(d2m, [d1a, d1m, d1b]).
 
-estado_inicial(estado(d2m, [i1a, i2m, i1b], Turno)).
+estado_inicial(estado(d2m, [i1a, i2m, i1b], liebre)).
 
 mostrar_estado(estado(Liebre, Sabuesos, Turno)) :-
     format("Liebre en: ~w~n", [Liebre]),
